@@ -1,0 +1,84 @@
+{
+  "D:\\OneDrive\\Documentos\\Códigos\\graphql_api": {
+    "versionSfCore": null,
+    "versionFramework": "4.0.26",
+    "isWithinCompose": false,
+    "composeOrgName": null,
+    "servicePath": "D:\\OneDrive\\Documentos\\Códigos\\graphql_api",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "org": "natatgh",
+      "service": "graphql-api",
+      "provider": {
+        "name": "aws",
+        "runtime": "python3.8",
+        "region": "us-east-1"
+      },
+      "functions": {
+        "app": {
+          "handler": "wsgi_handler.handler",
+          "events": [
+            {
+              "http": {
+                "path": "/",
+                "method": "ANY"
+              }
+            },
+            {
+              "http": {
+                "path": "/{proxy+}",
+                "method": "ANY"
+              }
+            }
+          ]
+        }
+      },
+      "plugins": [
+        "serverless-wsgi",
+        "serverless-python-requirements"
+      ],
+      "custom": {
+        "wsgi": {
+          "app": "app.app",
+          "packRequirements": true
+        }
+      }
+    },
+    "serviceRawFile": "# \"org\" ensures this Service is used with the correct Serverless Framework Access Key.\norg: natatgh\nservice: graphql-api\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: python3.8\r\n  region: us-east-1\r\n\r\nfunctions:\r\n  app:\r\n    handler: wsgi_handler.handler\r\n    events:\r\n      - http:\r\n          path: /\r\n          method: ANY\r\n      - http:\r\n          path: /{proxy+}\r\n          method: ANY\r\n\r\nplugins:\r\n  - serverless-wsgi\r\n  - serverless-python-requirements\r\n\r\ncustom:\r\n  wsgi:\r\n    app: app.app\r\n    packRequirements: true\r\n",
+    "command": [
+      "config",
+      "credentials"
+    ],
+    "options": {
+      "provider": "aws",
+      "key": "uL5SqQDCxZ4XX",
+      "secret": "<REDACTED>"
+    },
+    "error": {
+      "message": "AWS credentials missing or invalid. Run \"serverless\" to set up AWS credentials, or learn more in our docs: http://slss.io/aws-creds-setup.",
+      "code": "AWS_CREDENTIALS_MISSING"
+    },
+    "accessKeyV2": "<REDACTED>",
+    "accessKeyV1": "<REDACTED>",
+    "orgId": "74d9cd8e-080e-4de0-9267-3b73ecc6f8f4",
+    "orgName": "natatgh",
+    "userId": "d1gBN8SDgSfWD0jt23",
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "userName": "natatgh",
+    "subscription": null,
+    "userEmail": "natatgh@gmail.com",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}

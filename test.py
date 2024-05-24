@@ -130,7 +130,6 @@ query getContract($id: ID!) {
   getContract(id: $id) {
     description
     user {
-      id 
       name
       email
     }
@@ -142,17 +141,18 @@ query getContract($id: ID!) {
 """
 
 get_contracts_by_user_gql = """
-query getContractsByUser($user_id: ID!) {
-  getContractsByUser(user_id: $user_id) {
-    Contracts {
+query getContractsByUser($userId: ID!) {
+  getContractsByUser(userId: $userId) {
+    id
+    description
+    user {
       id
-      description
-      user_id
-      created_at
-      fidelity
-      amount
+      name
+      email
     }
-    nextToken
+    createdAt
+    fidelity
+    amount
   }
 }
 """
@@ -168,7 +168,13 @@ mutation deleteContract($id: ID!) {
 
 # Parâmetros para a consulta de obtenção de contrato por ID
 get_contract_variables = {
-    "id": "1"  # ID do contrato que você deseja obter
+    "id": "1",  # ID do contrato que você deseja obter
+    "userId": "1"  # Substitua pelo ID do usuário desejado
+}
+
+# Parâmetros para a consulta de obtenção de contrato por ID
+get_contracts_by_user_variables = {
+    "userId": "1"  # Substitua pelo ID do usuário desejado
 }
 
 # Executando as consultas usando requests
@@ -193,7 +199,8 @@ print("Response for getting contract:", response.json(), "\n")
 response = requests.post(url, json={'query': get_contract_withoutnested_gql, 'variables': get_contract_variables}, headers=headers)
 print("Response for getting contract without nested fields:", response.json(), "\n")
 
-response = requests.post(url, json={'query': get_contracts_by_user_gql, 'variables': {"user_id": "1"}}, headers=headers)
+# Executando a consulta usando requests
+response = requests.post(url, json={'query': get_contracts_by_user_gql, 'variables': get_contracts_by_user_variables}, headers=headers)
 print("Response for getting contracts by user:", response.json(), "\n")
 
 response = requests.post(url, json={'query': delete_contract_gql, 'variables': {"id": "1"}}, headers=headers)

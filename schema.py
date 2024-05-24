@@ -20,8 +20,8 @@ class GetUser(graphene.ObjectType):
 class GetContract(graphene.ObjectType):
     contract_id = graphene.ID()  # Rename to contract_id to avoid conflict with the 'id' field
     description = graphene.String()
-    user = graphene.Field(GetUser)
-    created_at = graphene.String()
+    user = graphene.Field(lambda: User)  # Use lambda to avoid circular reference
+    created_at = graphene.String()  # Use snake_case for consistency
     fidelity = graphene.Int()
     amount = graphene.Float()
     id = graphene.ID()  # Include the 'id' field
@@ -31,7 +31,7 @@ class Query(graphene.ObjectType):
     user = graphene.Field(User, id=graphene.ID(required=True))
     contracts = graphene.List(Contract)
     contract = graphene.Field(Contract, id=graphene.ID(required=True))
-    get_contract = graphene.Field(GetContract, id=graphene.ID(required=True))  # Novo método para obter contrato com detalhes do usuário
+    get_contract = graphene.Field(GetContract, id=graphene.ID(required=True))  # New method to get contract with user details
     getContractsByUser = graphene.List(GetContract, userId=graphene.ID(required=True))  # Use 'userId' instead of 'user_id'
 
     def resolve_users(self, info):
@@ -55,7 +55,7 @@ class Query(graphene.ObjectType):
                     contract_id=contract.id,
                     description=contract.description,
                     user=user,
-                    created_at=datetime.strftime(contract.created_at, "%Y-%m-%d %H:%M:%S"),
+                    created_at=contract.created_at.strftime("%Y-%m-%d %H:%M:%S"),
                     fidelity=contract.fidelity,
                     amount=contract.amount
                 )
@@ -63,15 +63,17 @@ class Query(graphene.ObjectType):
 
     def resolve_getContractsByUser(self, info, userId):  # Use 'userId' instead of 'user_id'
         contracts = ContractModel.query.filter_by(user_id=userId).all()
-        return [GetContract(
-                    contract_id=contract.id,
-                    description=contract.description,
-                    user=UserModel.query.get(contract.user_id),
-                    created_at=datetime.strftime(contract.created_at, "%Y-%m-%d %H:%M:%S"),
-                    fidelity=contract.fidelity,
-                    amount=contract.amount,
-                    id=contract.id  # Include the 'id' field
-                ) for contract in contracts]
+        return [
+            GetContract(
+                contract_id=contract.id,
+                description=contract.description,
+                user=UserModel.query.get(contract.user_id),
+                created_at=contract.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                fidelity=contract.fidelity,
+                amount=contract.amount,
+                id=contract.id  # Include the 'id' field
+            ) for contract in contracts
+        ]
 
 class CreateUserInput(graphene.InputObjectType):
     name = graphene.String(required=True)
