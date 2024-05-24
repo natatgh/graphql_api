@@ -10,9 +10,11 @@ headers = {'Content-Type': 'application/json'}
 create_user_gql = """
 mutation createUser($input: CreateUserInput!) {
   createUser(input: $input) {
-    id
-    name
-    email
+    user {
+      id
+      name
+      email
+    }
   }
 }
 """
@@ -28,7 +30,7 @@ create_user_variables = {
 # Consulta para obter um usuário por ID
 get_user_gql = """
 query getUser($id: ID!) {
-  getUser(id: $id) {
+  user(id: $id) {
     id
     name
     email
@@ -41,13 +43,15 @@ get_user_variables = {
     "id": "1"  # ID do usuário que você deseja obter
 }
 
-# Consulta para atualizar um usuário
+# Atualização de Usuário
 update_user_gql = """
-mutation updateUser($id: ID!, $input: CreateUserInput!) {
+mutation updateUser($id: ID!, $input: UpdateUserInput!) {
   updateUser(id: $id, input: $input) {
-    id
-    name
-    email
+    user {
+      id
+      name
+      email
+    }
   }
 }
 """
@@ -107,7 +111,7 @@ create_contract_variables = {
 get_contract_gql = """
 query getContract($id: ID!) {
   getContract(id: $id) {
-    id
+    contractId
     description
     user {
       id
@@ -125,8 +129,12 @@ get_contract_withoutnested_gql = """
 query getContract($id: ID!) {
   getContract(id: $id) {
     description
-    user_id
-    created_at
+    user {
+      id 
+      name
+      email
+    }
+    createdAt
     fidelity
     amount
   }
@@ -165,28 +173,28 @@ get_contract_variables = {
 
 # Executando as consultas usando requests
 response = requests.post(url, json={'query': create_user_gql, 'variables': create_user_variables}, headers=headers)
-print("Response for creating user:", response.json())
+print("Response for creating user:", response.json(), "\n")
 
 response = requests.post(url, json={'query': get_user_gql, 'variables': get_user_variables}, headers=headers)
-print("Response for getting user:", response.json())
+print("Response for getting user:", response.json(), "\n")
 
 response = requests.post(url, json={'query': update_user_gql, 'variables': update_user_variables}, headers=headers)
-print("Response for updating user:", response.json())
+print("Response for updating user:", response.json(), "\n")
 
 response = requests.post(url, json={'query': delete_user_gql, 'variables': delete_user_variables}, headers=headers)
-print("Response for deleting user:", response.json())
+print("Response for deleting user:", response.json(), "\n")
 
 response = requests.post(url, json={'query': create_contract_gql, 'variables': create_contract_variables}, headers=headers)
-print("Response for creating contract:", response.json())
+print("Response for creating contract:", response.json(), "\n")
 
 response = requests.post(url, json={'query': get_contract_gql, 'variables': get_contract_variables}, headers=headers)
-print("Response for getting contract:", response.json())
+print("Response for getting contract:", response.json(), "\n")
 
 response = requests.post(url, json={'query': get_contract_withoutnested_gql, 'variables': get_contract_variables}, headers=headers)
-print("Response for getting contract without nested fields:", response.json())
+print("Response for getting contract without nested fields:", response.json(), "\n")
 
 response = requests.post(url, json={'query': get_contracts_by_user_gql, 'variables': {"user_id": "1"}}, headers=headers)
-print("Response for getting contracts by user:", response.json())
+print("Response for getting contracts by user:", response.json(), "\n")
 
 response = requests.post(url, json={'query': delete_contract_gql, 'variables': {"id": "1"}}, headers=headers)
 print("Response for deleting contract:", response.json())
