@@ -1,6 +1,4 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
 org: natatgh
-# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
 app: graphql
 service: graphql-api
 
@@ -26,5 +24,19 @@ plugins:
 
 custom:
   wsgi:
-    app: app.app
+    app: wsgi.application
     packRequirements: true
+  pythonRequirements:
+    dockerizePip: true
+    layer: true
+
+package:
+  exclude:
+    - node_modules/**
+    - venv/**
+    - __pycache__/**
+    - migrations/**
+    - tests/**
+    - .pytest_cache/**
+    - .serverless/**
+    - .vscode/**

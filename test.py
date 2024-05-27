@@ -10,7 +10,7 @@ headers = {'Content-Type': 'application/json'}
 create_user_gql = """
 mutation createUser($input: CreateUserInput!) {
   createUser(input: $input) {
-    user {
+  user {
       id
       name
       email
