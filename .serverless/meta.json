@@ -180,7 +180,7 @@
                   "S3Bucket": {
                     "Ref": "ServerlessDeploymentBucket"
                   },
-                  "S3Key": "serverless/flask-graphql-api/dev/1717355709928-2024-06-02T19:15:09.928Z/flask-graphql-api.zip"
+                  "S3Key": "serverless/flask-graphql-api/dev/1717361240636-2024-06-02T20:47:20.636Z/flask-graphql-api.zip"
                 },
                 "Handler": "wsgi_handler.handler",
                 "Runtime": "python3.8",
@@ -198,14 +198,14 @@
                 "AppLogGroup"
               ]
             },
-            "AppLambdaVersionykL7RDjECFhX6dq5dR6dneChx4KVCFW4iLZsK8VTSI8": {
+            "AppLambdaVersionxEZOjkaUr0yV3psCvvI9JFntmm82tdjMzLvkXPNZI": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "AppLambdaFunction"
                 },
-                "CodeSha256": "GsO/0zkbeaPb/sLGY8vaLGflEJg4r5FUMCuwjtV213g="
+                "CodeSha256": "T5A/MaqzgmU0lInjYu+YT1wcd6Q/F03OnBf4OH40WPM="
               }
             },
             "ApiGatewayRestApi": {
@@ -330,7 +330,7 @@
                 "AppLambdaPermissionApiGateway"
               ]
             },
-            "ApiGatewayDeployment1717355697556": {
+            "ApiGatewayDeployment1717361232086": {
               "Type": "AWS::ApiGateway::Deployment",
               "Properties": {
                 "RestApiId": {
@@ -393,7 +393,7 @@
             "AppLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "AppLambdaVersionykL7RDjECFhX6dq5dR6dneChx4KVCFW4iLZsK8VTSI8"
+                "Ref": "AppLambdaVersionxEZOjkaUr0yV3psCvvI9JFntmm82tdjMzLvkXPNZI"
               },
               "Export": {
                 "Name": "sls-flask-graphql-api-dev-AppLambdaFunctionQualifiedArn"
@@ -528,7 +528,7 @@
           "timeout": 6,
           "runtime": "python3.8",
           "vpc": {},
-          "versionLogicalId": "AppLambdaVersionykL7RDjECFhX6dq5dR6dneChx4KVCFW4iLZsK8VTSI8"
+          "versionLogicalId": "AppLambdaVersionxEZOjkaUr0yV3psCvvI9JFntmm82tdjMzLvkXPNZI"
         }
       },
       "plugins": [
@@ -554,7 +554,7 @@
           ".serverless-wsgi"
         ],
         "artifact": "D:\\OneDrive\\Documentos\\Códigos\\graphql_api\\.serverless\\flask-graphql-api.zip",
-        "artifactDirectoryName": "serverless/flask-graphql-api/dev/1717355709928-2024-06-02T19:15:09.928Z"
+        "artifactDirectoryName": "serverless/flask-graphql-api/dev/1717361240636-2024-06-02T20:47:20.636Z"
       }
     },
     "serviceRawFile": "org: natatgh\r\napp: graphql-api\r\nservice: flask-graphql-api\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: python3.8\r\n  stage: dev\r\n  region: us-east-1\r\n\r\nfunctions:\r\n  app:\r\n    handler: wsgi.handler\r\n    events:\r\n      - http: ANY /\r\n      - http: 'ANY {proxy+}'\r\n\r\nplugins:\r\n  - serverless-wsgi\r\n  - serverless-python-requirements\r\n\r\ncustom:\r\n  wsgi:\r\n    app: app.app\r\n    packRequirements: false\r\n\r\npackage:\r\n  exclude:\r\n    - node_modules/**\r\n    - venv/**\r\n    - .venv/**\r\n",
@@ -593,12 +593,12 @@
     "serviceProviderAwsCfStackName": "flask-graphql-api-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:381491840726:stack/flask-graphql-api-dev/af4ff4a0-2050-11ef-8f05-0affc31a4e7f",
     "serviceProviderAwsCfStackCreated": "2024-06-01T19:53:58.347Z",
-    "serviceProviderAwsCfStackUpdated": "2024-06-02T19:16:07.868Z",
+    "serviceProviderAwsCfStackUpdated": "2024-06-02T20:47:36.460Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "AppLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-east-1:381491840726:function:flask-graphql-api-dev-app:5",
+        "OutputValue": "arn:aws:lambda:us-east-1:381491840726:function:flask-graphql-api-dev-app:10",
         "Description": "Current Lambda function version",
         "ExportName": "sls-flask-graphql-api-dev-AppLambdaFunctionQualifiedArn"
       },

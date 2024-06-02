@@ -162,7 +162,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/flask-graphql-api/dev/1717355709928-2024-06-02T19:15:09.928Z/flask-graphql-api.zip"
+          "S3Key": "serverless/flask-graphql-api/dev/1717361240636-2024-06-02T20:47:20.636Z/flask-graphql-api.zip"
         },
         "Handler": "wsgi_handler.handler",
         "Runtime": "python3.8",
@@ -180,14 +180,14 @@
         "AppLogGroup"
       ]
     },
-    "AppLambdaVersionykL7RDjECFhX6dq5dR6dneChx4KVCFW4iLZsK8VTSI8": {
+    "AppLambdaVersionxEZOjkaUr0yV3psCvvI9JFntmm82tdjMzLvkXPNZI": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "AppLambdaFunction"
         },
-        "CodeSha256": "GsO/0zkbeaPb/sLGY8vaLGflEJg4r5FUMCuwjtV213g="
+        "CodeSha256": "T5A/MaqzgmU0lInjYu+YT1wcd6Q/F03OnBf4OH40WPM="
       }
     },
     "ApiGatewayRestApi": {
@@ -312,7 +312,7 @@
         "AppLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1717355697556": {
+    "ApiGatewayDeployment1717361232086": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -375,7 +375,7 @@
     "AppLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AppLambdaVersionykL7RDjECFhX6dq5dR6dneChx4KVCFW4iLZsK8VTSI8"
+        "Ref": "AppLambdaVersionxEZOjkaUr0yV3psCvvI9JFntmm82tdjMzLvkXPNZI"
       },
       "Export": {
         "Name": "sls-flask-graphql-api-dev-AppLambdaFunctionQualifiedArn"

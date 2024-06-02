@@ -3,13 +3,16 @@ import requests
 # URL do seu servidor GraphQL
 url = 'http://localhost:5000/graphql'
 
+# Sua API Key
+api_key = 'j2w9UHvP4bQz9g9V7vQ4tM6z2eK5tYx3'
+
 # Headers para indicar que estamos enviando uma consulta GraphQL
 headers = {'Content-Type': 'application/json'}
 
-# Consulta para criar um usuário
+# Consultas e variáveis para criação, atualização, exclusão e obtenção de usuários e contratos
 create_user_gql = """
-mutation createUser($input: CreateUserInput!) {
-  createUser(input: $input) {
+mutation createUser($input: CreateUserInput!, $api_key: String!) {
+  createUser(input: $input, api_key: $api_key) {
     id
     name
     email
@@ -17,18 +20,18 @@ mutation createUser($input: CreateUserInput!) {
 }
 """
 
-# Parâmetros para a consulta de criação de usuário
 create_user_variables = {
     "input": {
         "name": "John Doe",
-        "email": "john.doe@example.com"
-    }
+        "email": "john.doe@example.com",
+        "password": "password"
+    },
+    "api_key": api_key
 }
 
-# Consulta para obter um usuário por ID
 get_user_gql = """
-query getUser($id: ID!) {
-  getUser(id: $id) {
+query getUser($id: ID!, $api_key: String!) {
+  getUser(id: $id, api_key: $api_key) {
     id
     name
     email
@@ -36,15 +39,14 @@ query getUser($id: ID!) {
 }
 """
 
-# Parâmetros para a consulta de obtenção de usuário por ID
 get_user_variables = {
-    "id": "1"  # ID do usuário que você deseja obter
+    "id": "1",
+    "api_key": api_key
 }
 
-# Atualização de Usuário
 update_user_gql = """
-mutation updateUser($id: ID!, $input: UpdateUserInput!) {
-  updateUser(id: $id, input: $input) {
+mutation updateUser($id: ID!, $input: UpdateUserInput!, $api_key: String!) {
+  updateUser(id: $id, input: $input, api_key: $api_key) {
     id
     name
     email
@@ -55,34 +57,33 @@ mutation updateUser($id: ID!, $input: UpdateUserInput!) {
 }
 """
 
-# Parâmetros para a consulta de atualização de usuário
 update_user_variables = {
-    "id": "1",  # ID do usuário que você deseja atualizar
+    "id": "1",
     "input": {
         "name": "John Doe Updated",
-        "email": "john.doe.updated@example.com"
-    }
+        "email": "john.doe.updated@example.com",
+        "password": "newpassword"
+    },
+    "api_key": api_key
 }
 
-# Consulta para excluir um usuário
 delete_user_gql = """
-mutation deleteUser($id: ID!) {
-  deleteUser(id: $id) {
+mutation deleteUser($id: ID!, $api_key: String!) {
+  deleteUser(id: $id, api_key: $api_key) {
     success
     message
   }
 }
 """
 
-# Parâmetros para a consulta de exclusão de usuário
 delete_user_variables = {
-    "id": "1"  # ID do usuário que você deseja excluir
+    "id": "1",
+    "api_key": api_key
 }
 
-# Consulta para criar um contrato
 create_contract_gql = """
-mutation createContract($input: CreateContractInput!) {
-  createContract(input: $input) {
+mutation createContract($input: CreateContractInput!, $api_key: String!) {
+  createContract(input: $input, api_key: $api_key) {
     id
     description
     user_id
@@ -93,21 +94,20 @@ mutation createContract($input: CreateContractInput!) {
 }
 """
 
-# Parâmetros para a consulta de criação de contrato
 create_contract_variables = {
-  "input": {
-      "description": "New Contract",
-      "user_id": "1",  # ID do usuário associado ao contrato
-      "created_at": "2024-05-22T00:00:00",  # Formato ISO 8601
-      "fidelity": 5,
-      "amount": 1000.00
-  }
+    "input": {
+        "description": "New Contract",
+        "user_id": "1",
+        "created_at": "2024-05-22T00:00:00",
+        "fidelity": 5,
+        "amount": 1000.00
+    },
+    "api_key": api_key
 }
 
-# Consulta para atualizar um contrato por ID
 update_contract_gql = """
-mutation updateContract($id: ID!, $input: UpdateContractInput!) {
-  updateContract(id: $id, input: $input) {
+mutation updateContract($id: ID!, $input: UpdateContractInput!, $api_key: String!) {
+  updateContract(id: $id, input: $input, api_key: $api_key) {
     id
     description
     user_id
@@ -118,22 +118,21 @@ mutation updateContract($id: ID!, $input: UpdateContractInput!) {
 }
 """
 
-# Parâmetros para a consulta de atualização de contrato
 update_contract_variables = {
-    "id": "1",  # ID do contrato que você deseja atualizar
+    "id": "1",
     "input": {
         "description": "Updated Contract",
-        "user_id": "1",  # ID do usuário associado ao contrato
-        "created_at": "2024-05-22T00:00:00",  # Formato ISO 8601
+        "user_id": "1",
+        "created_at": "2024-05-22T00:00:00",
         "fidelity": 10,
         "amount": 2000.00
-    }
+    },
+    "api_key": api_key
 }
 
-# Consulta para obter um contrato por ID
 get_contract_gql = """
-query getContract($id: ID!) {
-  getContract(id: $id) {
+query getContract($id: ID!, $api_key: String!) {
+  getContract(id: $id, api_key: $api_key) {
     description
     user_id
     user {
@@ -148,14 +147,14 @@ query getContract($id: ID!) {
 }
 """
 
-# Parâmetros para a consulta de obtenção de contrato por ID
 get_contract_variables = {
-    "id": "1"  # ID do contrato que você deseja obter
+    "id": "1",
+    "api_key": api_key
 }
 
 get_contract_withoutnested_gql = """
-query getContract($id: ID!) {
-  getContract(id: $id) {
+query getContract($id: ID!, $api_key: String!) {
+  getContract(id: $id, api_key: $api_key) {
     description
     user_id
     created_at
@@ -165,10 +164,9 @@ query getContract($id: ID!) {
 }
 """
 
-# Consulta para obter contratos por ID de usuário
 get_contracts_by_user_gql = """
-query getContractsByUser($user_id: ID!) {
-  getContractsByUser(user_id: $user_id) {
+query getContractsByUser($user_id: ID!, $api_key: String!) {
+  getContractsByUser(user_id: $user_id, api_key: $api_key) {
     Contracts {
       id
       description
@@ -182,27 +180,25 @@ query getContractsByUser($user_id: ID!) {
 }
 """
 
-# Parâmetros para a consulta de obtenção de contratos por ID de usuário
 get_contracts_by_user_variables = {
-    "user_id": "1"  # ID do usuário que você deseja obter os contratos
+    "user_id": "1",
+    "api_key": api_key
 }
 
-# Consulta para excluir um contrato
 delete_contract_gql = """
-mutation deleteContract($id: ID!) {
-  deleteContract(id: $id) {
+mutation deleteContract($id: ID!, $api_key: String!) {
+  deleteContract(id: $id, api_key: $api_key) {
     success
     message
   }
 }
 """
 
-# Parâmetros para a consulta de exclusão de contrato
 delete_contract_variables = {
-    "id": "1"  # ID do contrato que você deseja excluir
+    "id": "1",
+    "api_key": api_key
 }
 
-# Função para executar as consultas usando requests
 def execute_gql(query, variables):
     response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers)
     return response.json()

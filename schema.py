@@ -2,6 +2,7 @@ import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from models import User as UserModel, Contract as ContractModel
 from database import db_session
+from auth import validate_api_token
 import datetime
 
 class UserType(SQLAlchemyObjectType):
@@ -16,23 +17,39 @@ class UserExistsError(graphene.ObjectType):
     message = graphene.String()
     user_name = graphene.String()
 
+class UserNotFoundError(graphene.ObjectType):
+    message = graphene.String()
+
+class UserDeletionError(graphene.ObjectType):
+    message = graphene.String()
+
+class ContractNotFoundError(graphene.ObjectType):
+    message = graphene.String()
+
+class ContractDeletionError(graphene.ObjectType):
+    message = graphene.String()
+
 class CreateUserInput(graphene.InputObjectType):
     name = graphene.String(required=True)
     email = graphene.String(required=True)
+    password = graphene.String(required=True)
 
 class CreateUser(graphene.Mutation):
     class Arguments:
         input = CreateUserInput(required=True)
+        api_key = graphene.String(required=True)
 
     id = graphene.ID()
     name = graphene.String()
     email = graphene.String()
     error = graphene.Field(UserExistsError)
 
-    def mutate(self, info, input):
+    def mutate(self, info, input, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
+
         existing_user = UserModel.query.filter_by(email=input.email).first()
         if existing_user:
-            print("User with email already exists:", input.email)
             return CreateUser(
                 id=None,
                 name=None,
@@ -43,8 +60,8 @@ class CreateUser(graphene.Mutation):
                 )
             )
         
-        print("Creating new user:", input.name)
         user = UserModel(name=input.name, email=input.email)
+        user.set_password(input.password)
         db_session.add(user)
         db_session.commit()
         
@@ -58,6 +75,7 @@ class CreateUser(graphene.Mutation):
 class UpdateUserInput(graphene.InputObjectType):
     name = graphene.String()
     email = graphene.String()
+    password = graphene.String()
 
 class UserUpdateError(graphene.ObjectType):
     message = graphene.String()
@@ -66,13 +84,17 @@ class UpdateUser(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
         input = UpdateUserInput(required=True)
+        api_key = graphene.String(required=True)
 
     id = graphene.ID()
     name = graphene.String()
     email = graphene.String()
     error = graphene.Field(UserUpdateError)
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, input, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
+
         user = UserModel.query.get(id)
         if not user:
             return UpdateUser(
@@ -88,6 +110,8 @@ class UpdateUser(graphene.Mutation):
             user.name = input.name
         if input.email:
             user.email = input.email
+        if input.password:
+            user.set_password(input.password)
         
         db_session.commit()
         
@@ -101,23 +125,28 @@ class UpdateUser(graphene.Mutation):
 class DeleteUser(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
+        api_key = graphene.String(required=True)
 
     success = graphene.Boolean()
     message = graphene.String()
+    error = graphene.Field(UserDeletionError)
 
-    def mutate(self, info, id):
+    def mutate(self, info, id, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
+
         user = UserModel.query.get(id)
         if not user:
-            return DeleteUser(success=False, message="User not found.")
-
+            return DeleteUser(success=False, message="User not found.", error=UserDeletionError(message="User not found."))
+        
         contracts = ContractModel.query.filter_by(user_id=id).all()
-        for contract in contracts:
-            db_session.delete(contract)
+        if contracts:
+            return DeleteUser(success=False, message="User has associated contracts and cannot be deleted.", error=UserDeletionError(message="User has associated contracts and cannot be deleted."))
 
         db_session.delete(user)
         db_session.commit()
         
-        return DeleteUser(success=True, message="User and associated contracts deleted successfully.")
+        return DeleteUser(success=True, message="User deleted successfully.", error=None)
 
 class CreateContractInput(graphene.InputObjectType):
     description = graphene.String(required=True)
@@ -129,6 +158,7 @@ class CreateContractInput(graphene.InputObjectType):
 class CreateContract(graphene.Mutation):
     class Arguments:
         input = CreateContractInput(required=True)
+        api_key = graphene.String(required=True)
 
     id = graphene.ID()
     description = graphene.String()
@@ -137,15 +167,22 @@ class CreateContract(graphene.Mutation):
     fidelity = graphene.Int()
     amount = graphene.Float()
 
-    def mutate(self, info, input):
-        created_at = datetime.datetime.strptime(input.created_at, "%Y-%m-%dT%H:%M:%S")
+    def mutate(self, info, input, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
+
+        try:
+            created_at = datetime.datetime.strptime(input.created_at, "%Y-%m-%dT%H:%M:%S")
+        except ValueError:
+            raise Exception("Incorrect data format, should be YYYY-MM-DDTHH:MM:SS")
+        
         contract = ContractModel(
             description=input.description,
             user_id=input.user_id,
             created_at=created_at,
             fidelity=input.fidelity,
             amount=input.amount
-        ) 
+        )
         db_session.add(contract)
         db_session.commit()
         return CreateContract(
@@ -168,25 +205,31 @@ class UpdateContract(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
         input = UpdateContractInput(required=True)
+        api_key = graphene.String(required=True)
 
     contract = graphene.Field(ContractType)
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, input, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
+
         contract = ContractModel.query.get(id)
         if not contract:
             return UpdateContract(contract=None)
 
-        if input:
-            if input.description:
-                contract.description = input.description
-            if input.user_id:
-                contract.user_id = input.user_id
-            if input.created_at:
+        if input.description:
+            contract.description = input.description
+        if input.user_id:
+            contract.user_id = input.user_id
+        if input.created_at:
+            try:
                 contract.created_at = datetime.datetime.strptime(input.created_at, "%Y-%m-%dT%H:%M:%S")
-            if input.fidelity:
-                contract.fidelity = input.fidelity
-            if input.amount:
-                contract.amount = input.amount
+            except ValueError:
+                raise Exception("Incorrect data format, should be YYYY-MM-DDTHH:MM:SS")
+        if input.fidelity:
+            contract.fidelity = input.fidelity
+        if input.amount:
+            contract.amount = input.amount
 
         db_session.commit()
         return UpdateContract(contract=contract)
@@ -194,17 +237,23 @@ class UpdateContract(graphene.Mutation):
 class DeleteContract(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
+        api_key = graphene.String(required=True)
 
     success = graphene.Boolean()
     message = graphene.String()
+    error = graphene.Field(ContractDeletionError)
 
-    def mutate(self, info, id):
+    def mutate(self, info, id, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
+
         contract = ContractModel.query.get(id)
-        if contract:
-            db_session.delete(contract)
-            db_session.commit()
-            return DeleteContract(success=True, message="Contract deleted successfully.")
-        return DeleteContract(success=False, message="Contract not found.")
+        if not contract:
+            return DeleteContract(success=False, message=None, error=ContractDeletionError(message="Contract not found."))
+        
+        db_session.delete(contract)
+        db_session.commit()
+        return DeleteContract(success=True, message="Contract deleted successfully.", error=None)
 
 class User(graphene.ObjectType):
     id = graphene.ID()
@@ -236,27 +285,37 @@ class GetContract(graphene.ObjectType):
         return UserModel.query.get(parent.user_id)
 
 class Query(graphene.ObjectType):
-    users = graphene.List(User)
-    user = graphene.Field(User, id=graphene.ID(required=True))
-    contracts = graphene.List(Contract)
-    contract = graphene.Field(Contract, id=graphene.ID(required=True))
-    getContract = graphene.Field(GetContract, id=graphene.ID(required=True))
-    getContractsByUser = graphene.Field(ContractsResult, user_id=graphene.ID(required=True))
-    getUser = graphene.Field(User, id=graphene.ID(required=True))
+    users = graphene.List(User, api_key=graphene.String(required=True))
+    user = graphene.Field(User, id=graphene.ID(required=True), api_key=graphene.String(required=True))
+    contracts = graphene.List(Contract, api_key=graphene.String(required=True))
+    contract = graphene.Field(Contract, id=graphene.ID(required=True), api_key=graphene.String(required=True))
+    getContract = graphene.Field(GetContract, id=graphene.ID(required=True), api_key=graphene.String(required=True))
+    getContractsByUser = graphene.Field(ContractsResult, user_id=graphene.ID(required=True), api_key=graphene.String(required=True))
+    getUser = graphene.Field(User, id=graphene.ID(required=True), api_key=graphene.String(required=True))
 
-    def resolve_users(self, info):
+    def resolve_users(self, info, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
         return UserModel.query.all()
 
-    def resolve_user(self, info, id):
+    def resolve_user(self, info, id, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
         return UserModel.query.get(id)
 
-    def resolve_contracts(self, info):
+    def resolve_contracts(self, info, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
         return ContractModel.query.all()
 
-    def resolve_contract(self, info, id):
+    def resolve_contract(self, info, id, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
         return ContractModel.query.get(id)
 
-    def resolve_getContract(self, info, id):
+    def resolve_getContract(self, info, id, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
         contract = ContractModel.query.get(id)
         if contract:
             return GetContract(
@@ -269,12 +328,16 @@ class Query(graphene.ObjectType):
             )
         return None
 
-    def resolve_getContractsByUser(self, info, user_id):
-        Contracts = ContractModel.query.filter_by(user_id=user_id).all()
+    def resolve_getContractsByUser(self, info, user_id, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
+        contracts = ContractModel.query.filter_by(user_id=user_id).all()
         nextToken = None  # You can implement your pagination token logic here
-        return ContractsResult(Contracts=Contracts, nextToken=nextToken)
+        return ContractsResult(Contracts=contracts, nextToken=nextToken)
     
-    def resolve_getUser(self, info, id):
+    def resolve_getUser(self, info, id, api_key):
+        if not validate_api_token(api_key):
+            raise Exception("Invalid API Key")
         return UserModel.query.get(id)
 
 class Mutation(graphene.ObjectType):
