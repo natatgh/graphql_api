@@ -4,6 +4,7 @@ from models import User as UserModel, Contract as ContractModel
 from database import db_session
 import datetime
 
+# Definindo tipos GraphQL baseados nos modelos SQLAlchemy
 class UserType(SQLAlchemyObjectType):
     class Meta:
         model = UserModel
@@ -12,14 +13,17 @@ class ContractType(SQLAlchemyObjectType):
     class Meta:
         model = ContractModel
 
+# Definindo tipos de erro para mensagens de erro específicas
 class UserExistsError(graphene.ObjectType):
     message = graphene.String()
     user_name = graphene.String()
 
+# Input para a mutação de criação de usuário
 class CreateUserInput(graphene.InputObjectType):
     name = graphene.String(required=True)
     email = graphene.String(required=True)
 
+# Mutação para criação de usuário
 class CreateUser(graphene.Mutation):
     class Arguments:
         input = CreateUserInput(required=True)
@@ -30,6 +34,7 @@ class CreateUser(graphene.Mutation):
     error = graphene.Field(UserExistsError)
 
     def mutate(self, info, input):
+        # Verifica se o usuário já existe
         existing_user = UserModel.query.filter_by(email=input.email).first()
         if existing_user:
             print("User with email already exists:", input.email)
@@ -43,6 +48,7 @@ class CreateUser(graphene.Mutation):
                 )
             )
         
+        # Cria um novo usuário
         print("Creating new user:", input.name)
         user = UserModel(name=input.name, email=input.email)
         db_session.add(user)
@@ -55,13 +61,16 @@ class CreateUser(graphene.Mutation):
             error=None
         )
 
+# Input para a mutação de atualização de usuário
 class UpdateUserInput(graphene.InputObjectType):
     name = graphene.String()
     email = graphene.String()
 
+# Definindo tipos de erro para atualização de usuário
 class UserUpdateError(graphene.ObjectType):
     message = graphene.String()
 
+# Mutação para atualização de usuário
 class UpdateUser(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
@@ -73,6 +82,7 @@ class UpdateUser(graphene.Mutation):
     error = graphene.Field(UserUpdateError)
 
     def mutate(self, info, id, input):
+        # Verifica se o usuário existe
         user = UserModel.query.get(id)
         if not user:
             return UpdateUser(
@@ -84,6 +94,7 @@ class UpdateUser(graphene.Mutation):
                 )
             )
         
+        # Atualiza os dados do usuário
         if input.name:
             user.name = input.name
         if input.email:
@@ -97,7 +108,8 @@ class UpdateUser(graphene.Mutation):
             email=user.email,
             error=None
         )
-    
+
+# Mutação para exclusão de usuário
 class DeleteUser(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
@@ -106,19 +118,23 @@ class DeleteUser(graphene.Mutation):
     message = graphene.String()
 
     def mutate(self, info, id):
+        # Verifica se o usuário existe
         user = UserModel.query.get(id)
         if not user:
             return DeleteUser(success=False, message="User not found.")
 
+        # Exclui os contratos associados ao usuário
         contracts = ContractModel.query.filter_by(user_id=id).all()
         for contract in contracts:
             db_session.delete(contract)
 
+        # Exclui o usuário
         db_session.delete(user)
         db_session.commit()
         
         return DeleteUser(success=True, message="User and associated contracts deleted successfully.")
 
+# Input para a mutação de criação de contrato
 class CreateContractInput(graphene.InputObjectType):
     description = graphene.String(required=True)
     user_id = graphene.ID(required=True)
@@ -126,6 +142,7 @@ class CreateContractInput(graphene.InputObjectType):
     fidelity = graphene.Int(required=True)
     amount = graphene.Float(required=True)
 
+# Mutação para criação de contrato
 class CreateContract(graphene.Mutation):
     class Arguments:
         input = CreateContractInput(required=True)
@@ -138,7 +155,10 @@ class CreateContract(graphene.Mutation):
     amount = graphene.Float()
 
     def mutate(self, info, input):
+        # Converte a data de criação para o formato datetime
         created_at = datetime.datetime.strptime(input.created_at, "%Y-%m-%dT%H:%M:%S")
+        
+        # Cria um novo contrato
         contract = ContractModel(
             description=input.description,
             user_id=input.user_id,
@@ -148,6 +168,7 @@ class CreateContract(graphene.Mutation):
         ) 
         db_session.add(contract)
         db_session.commit()
+        
         return CreateContract(
             id=contract.id,
             description=contract.description,
@@ -157,6 +178,7 @@ class CreateContract(graphene.Mutation):
             amount=contract.amount
         )
 
+# Input para a mutação de atualização de contrato
 class UpdateContractInput(graphene.InputObjectType):
     description = graphene.String()
     user_id = graphene.ID()
@@ -164,6 +186,7 @@ class UpdateContractInput(graphene.InputObjectType):
     fidelity = graphene.Int()
     amount = graphene.Float()
 
+# Mutação para atualização de contrato
 class UpdateContract(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
@@ -172,25 +195,28 @@ class UpdateContract(graphene.Mutation):
     contract = graphene.Field(ContractType)
 
     def mutate(self, info, id, input):
+        # Verifica se o contrato existe
         contract = ContractModel.query.get(id)
         if not contract:
             return UpdateContract(contract=None)
 
-        if input:
-            if input.description:
-                contract.description = input.description
-            if input.user_id:
-                contract.user_id = input.user_id
-            if input.created_at:
-                contract.created_at = datetime.datetime.strptime(input.created_at, "%Y-%m-%dT%H:%M:%S")
-            if input.fidelity:
-                contract.fidelity = input.fidelity
-            if input.amount:
-                contract.amount = input.amount
+        # Atualiza os dados do contrato
+        if input.description:
+            contract.description = input.description
+        if input.user_id:
+            contract.user_id = input.user_id
+        if input.created_at:
+            contract.created_at = datetime.datetime.strptime(input.created_at, "%Y-%m-%dT%H:%M:%S")
+        if input.fidelity:
+            contract.fidelity = input.fidelity
+        if input.amount:
+            contract.amount = input.amount
 
         db_session.commit()
+        
         return UpdateContract(contract=contract)
 
+# Mutação para exclusão de contrato
 class DeleteContract(graphene.Mutation):
     class Arguments:
         id = graphene.ID(required=True)
@@ -199,13 +225,16 @@ class DeleteContract(graphene.Mutation):
     message = graphene.String()
 
     def mutate(self, info, id):
+        # Verifica se o contrato existe
         contract = ContractModel.query.get(id)
         if contract:
             db_session.delete(contract)
             db_session.commit()
             return DeleteContract(success=True, message="Contract deleted successfully.")
+        
         return DeleteContract(success=False, message="Contract not found.")
 
+# Definindo tipos GraphQL para consultas
 class User(graphene.ObjectType):
     id = graphene.ID()
     name = graphene.String()
@@ -235,6 +264,7 @@ class GetContract(graphene.ObjectType):
     def resolve_user(parent, info):
         return UserModel.query.get(parent.user_id)
 
+# Definindo consultas GraphQL
 class Query(graphene.ObjectType):
     users = graphene.List(User)
     user = graphene.Field(User, id=graphene.ID(required=True))
@@ -271,12 +301,13 @@ class Query(graphene.ObjectType):
 
     def resolve_getContractsByUser(self, info, user_id):
         Contracts = ContractModel.query.filter_by(user_id=user_id).all()
-        nextToken = None  # You can implement your pagination token logic here
+        nextToken = None  # Implementação da lógica de paginação, se necessário
         return ContractsResult(Contracts=Contracts, nextToken=nextToken)
     
     def resolve_getUser(self, info, id):
         return UserModel.query.get(id)
 
+# Definindo mutações GraphQL
 class Mutation(graphene.ObjectType):
     createUser = CreateUser.Field()
     updateUser = UpdateUser.Field()
@@ -285,4 +316,5 @@ class Mutation(graphene.ObjectType):
     updateContract = UpdateContract.Field()
     deleteContract = DeleteContract.Field()
 
+# Criando o schema GraphQL
 schema = graphene.Schema(query=Query, mutation=Mutation, auto_camelcase=False)

@@ -6,7 +6,7 @@ url = 'http://localhost:5000/graphql'
 # Headers para indicar que estamos enviando uma consulta GraphQL
 headers = {'Content-Type': 'application/json'}
 
-# Consulta para criar um usuário
+# Consulta para criar um usuário 
 create_user_gql = """
 mutation createUser($input: CreateUserInput!) {
   createUser(input: $input) {
@@ -17,7 +17,7 @@ mutation createUser($input: CreateUserInput!) {
 }
 """
 
-# Parâmetros para a consulta de criação de usuário
+# Parâmetros para a consulta de criação de usuario
 create_user_variables = {
     "input": {
         "name": "John Doe",
