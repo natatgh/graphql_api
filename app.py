@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_graphql import GraphQLView
-from schema import schema  # Importar seu schema GraphQL
+from schema import schema 
 from database import init_db
 
 app = Flask(__name__)

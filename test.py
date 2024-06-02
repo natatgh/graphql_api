@@ -10,11 +10,9 @@ headers = {'Content-Type': 'application/json'}
 create_user_gql = """
 mutation createUser($input: CreateUserInput!) {
   createUser(input: $input) {
-  user {
-      id
-      name
-      email
-    }
+    id
+    name
+    email
   }
 }
 """
@@ -30,7 +28,7 @@ create_user_variables = {
 # Consulta para obter um usuário por ID
 get_user_gql = """
 query getUser($id: ID!) {
-  user(id: $id) {
+  getUser(id: $id) {
     id
     name
     email
@@ -47,10 +45,11 @@ get_user_variables = {
 update_user_gql = """
 mutation updateUser($id: ID!, $input: UpdateUserInput!) {
   updateUser(id: $id, input: $input) {
-    user {
-      id
-      name
-      email
+    id
+    name
+    email
+    error {
+      message
     }
   }
 }
@@ -84,26 +83,50 @@ delete_user_variables = {
 create_contract_gql = """
 mutation createContract($input: CreateContractInput!) {
   createContract(input: $input) {
-    contract {
-      id
-      description
-      userId
-      createdAt
-      fidelity
-      amount
-    }
+    id
+    description
+    user_id
+    created_at
+    fidelity
+    amount
   }
 }
 """
 
 # Parâmetros para a consulta de criação de contrato
 create_contract_variables = {
+  "input": {
+      "description": "New Contract",
+      "user_id": "1",  # ID do usuário associado ao contrato
+      "created_at": "2024-05-22T00:00:00",  # Formato ISO 8601
+      "fidelity": 5,
+      "amount": 1000.00
+  }
+}
+
+# Consulta para atualizar um contrato por ID
+update_contract_gql = """
+mutation updateContract($id: ID!, $input: UpdateContractInput!) {
+  updateContract(id: $id, input: $input) {
+    id
+    description
+    user_id
+    created_at
+    fidelity
+    amount
+  }
+}
+"""
+
+# Parâmetros para a consulta de atualização de contrato
+update_contract_variables = {
+    "id": "1",  # ID do contrato que você deseja atualizar
     "input": {
-        "description": "New Contract",
-        "userId": "1",  # ID do usuário associado ao contrato
-        "createdAt": "2024-05-22T00:00:00",  # Formato ISO 8601
-        "fidelity": 5,
-        "amount": 1000.00
+        "description": "Updated Contract",
+        "user_id": "1",  # ID do usuário associado ao contrato
+        "created_at": "2024-05-22T00:00:00",  # Formato ISO 8601
+        "fidelity": 10,
+        "amount": 2000.00
     }
 }
 
@@ -111,52 +134,60 @@ create_contract_variables = {
 get_contract_gql = """
 query getContract($id: ID!) {
   getContract(id: $id) {
-    contractId
     description
+    user_id
     user {
       id
       name
       email
     }
-    createdAt
+    created_at
     fidelity
     amount
   }
 }
 """
+
+# Parâmetros para a consulta de obtenção de contrato por ID
+get_contract_variables = {
+    "id": "1"  # ID do contrato que você deseja obter
+}
 
 get_contract_withoutnested_gql = """
 query getContract($id: ID!) {
   getContract(id: $id) {
     description
-    user {
-      name
-      email
-    }
-    createdAt
+    user_id
+    created_at
     fidelity
     amount
   }
 }
 """
 
+# Consulta para obter contratos por ID de usuário
 get_contracts_by_user_gql = """
-query getContractsByUser($userId: ID!) {
-  getContractsByUser(userId: $userId) {
-    id
-    description
-    user {
+query getContractsByUser($user_id: ID!) {
+  getContractsByUser(user_id: $user_id) {
+    Contracts {
       id
-      name
-      email
+      description
+      user_id
+      created_at
+      fidelity
+      amount
     }
-    createdAt
-    fidelity
-    amount
+    nextToken
   }
 }
 """
 
+# Parâmetros para a consulta de obtenção de contratos por ID de usuário
+get_contracts_by_user_variables = {
+    "user_id": "1"  # ID do usuário que você deseja obter os contratos
+}
+
+# Consulta para excluir um contrato
 delete_contract_gql = """
 mutation deleteContract($id: ID!) {
   deleteContract(id: $id) {
@@ -166,42 +197,23 @@ mutation deleteContract($id: ID!) {
 }
 """
 
-# Parâmetros para a consulta de obtenção de contrato por ID
-get_contract_variables = {
-    "id": "1",  # ID do contrato que você deseja obter
-    "userId": "1"  # Substitua pelo ID do usuário desejado
+# Parâmetros para a consulta de exclusão de contrato
+delete_contract_variables = {
+    "id": "1"  # ID do contrato que você deseja excluir
 }
 
-# Parâmetros para a consulta de obtenção de contrato por ID
-get_contracts_by_user_variables = {
-    "userId": "1"  # Substitua pelo ID do usuário desejado
-}
+# Função para executar as consultas usando requests
+def execute_gql(query, variables):
+    response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers)
+    return response.json()
 
-# Executando as consultas usando requests
-response = requests.post(url, json={'query': create_user_gql, 'variables': create_user_variables}, headers=headers)
-print("Response for creating user:", response.json(), "\n")
-
-response = requests.post(url, json={'query': get_user_gql, 'variables': get_user_variables}, headers=headers)
-print("Response for getting user:", response.json(), "\n")
-
-response = requests.post(url, json={'query': update_user_gql, 'variables': update_user_variables}, headers=headers)
-print("Response for updating user:", response.json(), "\n")
-
-response = requests.post(url, json={'query': delete_user_gql, 'variables': delete_user_variables}, headers=headers)
-print("Response for deleting user:", response.json(), "\n")
-
-response = requests.post(url, json={'query': create_contract_gql, 'variables': create_contract_variables}, headers=headers)
-print("Response for creating contract:", response.json(), "\n")
-
-response = requests.post(url, json={'query': get_contract_gql, 'variables': get_contract_variables}, headers=headers)
-print("Response for getting contract:", response.json(), "\n")
-
-response = requests.post(url, json={'query': get_contract_withoutnested_gql, 'variables': get_contract_variables}, headers=headers)
-print("Response for getting contract without nested fields:", response.json(), "\n")
-
-# Executando a consulta usando requests
-response = requests.post(url, json={'query': get_contracts_by_user_gql, 'variables': get_contracts_by_user_variables}, headers=headers)
-print("Response for getting contracts by user:", response.json(), "\n")
-
-response = requests.post(url, json={'query': delete_contract_gql, 'variables': {"id": "1"}}, headers=headers)
-print("Response for deleting contract:", response.json())
+# Executando as consultas
+print("Response for creating user:", execute_gql(create_user_gql, create_user_variables), "\n")
+print("Response for getting user:", execute_gql(get_user_gql, get_user_variables), "\n")
+print("Response for updating user:", execute_gql(update_user_gql, update_user_variables), "\n")
+print("Response for creating contract:", execute_gql(create_contract_gql, create_contract_variables), "\n")
+print("Response for getting contract:", execute_gql(get_contract_gql, get_contract_variables), "\n")
+print("Response for getting contract without:", execute_gql(get_contract_withoutnested_gql, get_contract_variables), "\n")
+print("Response for getting contracts by user:", execute_gql(get_contracts_by_user_gql, get_contracts_by_user_variables), "\n")
+print("Response for deleting user:", execute_gql(delete_user_gql, delete_user_variables), "\n")
+print("Response for deleting contract:", execute_gql(delete_contract_gql, delete_contract_variables), "\n")

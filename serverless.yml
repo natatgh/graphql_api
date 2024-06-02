@@ -1,22 +1,19 @@
 org: natatgh
-app: graphql
-service: graphql-api
+app: graphql-api
+service: flask-graphql-api
 
 provider:
   name: aws
   runtime: python3.8
+  stage: dev
   region: us-east-1
 
 functions:
   app:
-    handler: wsgi_handler.handler
+    handler: wsgi.handler
     events:
-      - http:
-          path: /
-          method: ANY
-      - http:
-          path: /{proxy+}
-          method: ANY
+      - http: ANY /
+      - http: 'ANY {proxy+}'
 
 plugins:
   - serverless-wsgi
@@ -24,19 +21,11 @@ plugins:
 
 custom:
   wsgi:
-    app: wsgi.application
-    packRequirements: true
-  pythonRequirements:
-    dockerizePip: true
-    layer: true
+    app: app.app
+    packRequirements: false
 
 package:
   exclude:
     - node_modules/**
     - venv/**
-    - __pycache__/**
-    - migrations/**
-    - tests/**
-    - .pytest_cache/**
-    - .serverless/**
-    - .vscode/**
+    - .venv/**
