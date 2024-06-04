@@ -9,7 +9,7 @@ class User(Base):
     name = Column(String)
     email = Column(String, unique=True)
     password_hash = Column(String)
-    contracts = relationship('Contract', back_populates='user')
+    contracts = relationship('Contract', back_populates='user')  # Define a relação
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -22,14 +22,7 @@ class Contract(Base):
     id = Column(Integer, primary_key=True)
     description = Column(String)
     user_id = Column(Integer, ForeignKey('users.id'))
-    created_at = Column(DateTime)
+    created_at = Column(DateTime, nullable=False)
     fidelity = Column(Integer)
     amount = Column(Float)
-    user = relationship('User', back_populates='contracts')
-
-class APIToken(Base):
-    __tablename__ = 'api_tokens'
-    id = Column(Integer, primary_key=True)
-    token = Column(String, unique=True, index=True)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User')
+    user = relationship('User', back_populates='contracts')  # Define a relação inversa
