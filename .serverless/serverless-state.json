@@ -174,7 +174,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/flask-graphql-api/dev/1717355709928-2024-06-02T19:15:09.928Z/flask-graphql-api.zip"
+                "S3Key": "serverless/flask-graphql-api/dev/1717368828982-2024-06-02T22:53:48.982Z/flask-graphql-api.zip"
               },
               "Handler": "wsgi_handler.handler",
               "Runtime": "python3.8",
@@ -192,14 +192,14 @@
               "AppLogGroup"
             ]
           },
-          "AppLambdaVersionykL7RDjECFhX6dq5dR6dneChx4KVCFW4iLZsK8VTSI8": {
+          "AppLambdaVersionuuInhhKoBdTDJ0BFTsVVqIPPTbb8OX62UeicNfRo": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AppLambdaFunction"
               },
-              "CodeSha256": "GsO/0zkbeaPb/sLGY8vaLGflEJg4r5FUMCuwjtV213g="
+              "CodeSha256": "6coO1kkIFT8zDpiY1H3yk8hlfyVGtlHYsNLGmIovtV8="
             }
           },
           "ApiGatewayRestApi": {
@@ -324,7 +324,7 @@
               "AppLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1717355697556": {
+          "ApiGatewayDeployment1717368820303": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -387,7 +387,7 @@
           "AppLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AppLambdaVersionykL7RDjECFhX6dq5dR6dneChx4KVCFW4iLZsK8VTSI8"
+              "Ref": "AppLambdaVersionuuInhhKoBdTDJ0BFTsVVqIPPTbb8OX62UeicNfRo"
             },
             "Export": {
               "Name": "sls-flask-graphql-api-dev-AppLambdaFunctionQualifiedArn"
@@ -533,7 +533,7 @@
         "timeout": 6,
         "runtime": "python3.8",
         "vpc": {},
-        "versionLogicalId": "AppLambdaVersionykL7RDjECFhX6dq5dR6dneChx4KVCFW4iLZsK8VTSI8"
+        "versionLogicalId": "AppLambdaVersionuuInhhKoBdTDJ0BFTsVVqIPPTbb8OX62UeicNfRo"
       }
     },
     "configValidationMode": "warn",
@@ -567,7 +567,7 @@
           ".serverless-wsgi"
         ],
         "artifact": "D:\\OneDrive\\Documentos\\Códigos\\graphql_api\\.serverless\\flask-graphql-api.zip",
-        "artifactDirectoryName": "serverless/flask-graphql-api/dev/1717355709928-2024-06-02T19:15:09.928Z"
+        "artifactDirectoryName": "serverless/flask-graphql-api/dev/1717368828982-2024-06-02T22:53:48.982Z"
       }
     },
     "app": "graphql-api",
@@ -578,7 +578,7 @@
     "artifact": "D:\\OneDrive\\Documentos\\Códigos\\graphql_api\\.serverless\\flask-graphql-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/flask-graphql-api/dev/1717355709928-2024-06-02T19:15:09.928Z",
+    "artifactDirectoryName": "serverless/flask-graphql-api/dev/1717368828982-2024-06-02T22:53:48.982Z",
     "artifact": "flask-graphql-api.zip"
   }
 }
