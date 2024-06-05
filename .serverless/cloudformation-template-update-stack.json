@@ -71,10 +71,10 @@
         }
       }
     },
-    "AppLogGroup": {
+    "GraphqlLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/lambda/flask-graphql-api-dev-app"
+        "LogGroupName": "/aws/lambda/graphql-api-dev-graphql"
       }
     },
     "IamRoleLambdaExecution": {
@@ -102,7 +102,7 @@
               "Fn::Join": [
                 "-",
                 [
-                  "flask-graphql-api",
+                  "graphql-api",
                   "dev",
                   "lambda"
                 ]
@@ -120,7 +120,7 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/flask-graphql-api-dev*:*"
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/graphql-api-dev*:*"
                     }
                   ]
                 },
@@ -131,7 +131,7 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/flask-graphql-api-dev*:*:*"
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/graphql-api-dev*:*:*"
                     }
                   ]
                 }
@@ -144,7 +144,7 @@
           "Fn::Join": [
             "-",
             [
-              "flask-graphql-api",
+              "graphql-api",
               "dev",
               {
                 "Ref": "AWS::Region"
@@ -155,20 +155,26 @@
         }
       }
     },
-    "AppLambdaFunction": {
+    "GraphqlLambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/flask-graphql-api/dev/1717361240636-2024-06-02T20:47:20.636Z/flask-graphql-api.zip"
+          "S3Key": "serverless/graphql-api/dev/1717627066705-2024-06-05T22:37:46.705Z/graphql-api.zip"
         },
         "Handler": "wsgi_handler.handler",
         "Runtime": "python3.8",
-        "FunctionName": "flask-graphql-api-dev-app",
+        "FunctionName": "graphql-api-dev-graphql",
         "MemorySize": 1024,
         "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "SECRET_KEY": "your_secret_key_here",
+            "API_KEY": "j2w9UHvP4bQz9g9V7vQ4tM6z2eK5tYx3"
+          }
+        },
         "Role": {
           "Fn::GetAtt": [
             "IamRoleLambdaExecution",
@@ -177,23 +183,23 @@
         }
       },
       "DependsOn": [
-        "AppLogGroup"
+        "GraphqlLogGroup"
       ]
     },
-    "AppLambdaVersionxEZOjkaUr0yV3psCvvI9JFntmm82tdjMzLvkXPNZI": {
+    "GraphqlLambdaVersionr6waxs35W4rJdJmTctoqUm7KWYvrDItqaXReOjnIs": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
-          "Ref": "AppLambdaFunction"
+          "Ref": "GraphqlLambdaFunction"
         },
-        "CodeSha256": "T5A/MaqzgmU0lInjYu+YT1wcd6Q/F03OnBf4OH40WPM="
+        "CodeSha256": "6E362Srg7xMEkKgkeRiFc7epyO7RrER4rKNh2xN6wG4="
       }
     },
     "ApiGatewayRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
-        "Name": "dev-flask-graphql-api",
+        "Name": "dev-graphql-api",
         "EndpointConfiguration": {
           "Types": [
             "EDGE"
@@ -202,7 +208,7 @@
         "Policy": ""
       }
     },
-    "ApiGatewayResourceProxyVar": {
+    "ApiGatewayResourceGraphql": {
       "Type": "AWS::ApiGateway::Resource",
       "Properties": {
         "ParentId": {
@@ -211,68 +217,64 @@
             "RootResourceId"
           ]
         },
-        "PathPart": "{proxy+}",
+        "PathPart": "graphql",
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         }
       }
     },
-    "ApiGatewayMethodAny": {
+    "ApiGatewayMethodGraphqlOptions": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "HttpMethod": "ANY",
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
         "RequestParameters": {},
-        "ResourceId": {
-          "Fn::GetAtt": [
-            "ApiGatewayRestApi",
-            "RootResourceId"
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
           ]
         },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceGraphql"
+        },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
-        },
-        "ApiKeyRequired": false,
-        "AuthorizationType": "NONE",
-        "Integration": {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition"
-                },
-                ":apigateway:",
-                {
-                  "Ref": "AWS::Region"
-                },
-                ":lambda:path/2015-03-31/functions/",
-                {
-                  "Fn::GetAtt": [
-                    "AppLambdaFunction",
-                    "Arn"
-                  ]
-                },
-                "/invocations"
-              ]
-            ]
-          }
-        },
-        "MethodResponses": []
-      },
-      "DependsOn": [
-        "AppLambdaPermissionApiGateway"
-      ]
+        }
+      }
     },
-    "ApiGatewayMethodProxyVarAny": {
+    "ApiGatewayMethodGraphqlPost": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
-        "HttpMethod": "ANY",
+        "HttpMethod": "POST",
         "RequestParameters": {},
         "ResourceId": {
-          "Ref": "ApiGatewayResourceProxyVar"
+          "Ref": "ApiGatewayResourceGraphql"
         },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
@@ -297,7 +299,7 @@
                 ":lambda:path/2015-03-31/functions/",
                 {
                   "Fn::GetAtt": [
-                    "AppLambdaFunction",
+                    "GraphqlLambdaFunction",
                     "Arn"
                   ]
                 },
@@ -309,10 +311,10 @@
         "MethodResponses": []
       },
       "DependsOn": [
-        "AppLambdaPermissionApiGateway"
+        "GraphqlLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1717361232086": {
+    "ApiGatewayDeployment1717627053249": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -321,16 +323,16 @@
         "StageName": "dev"
       },
       "DependsOn": [
-        "ApiGatewayMethodAny",
-        "ApiGatewayMethodProxyVarAny"
+        "ApiGatewayMethodGraphqlOptions",
+        "ApiGatewayMethodGraphqlPost"
       ]
     },
-    "AppLambdaPermissionApiGateway": {
+    "GraphqlLambdaPermissionApiGateway": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Fn::GetAtt": [
-            "AppLambdaFunction",
+            "GraphqlLambdaFunction",
             "Arn"
           ]
         },
@@ -369,16 +371,16 @@
         "Ref": "ServerlessDeploymentBucket"
       },
       "Export": {
-        "Name": "sls-flask-graphql-api-dev-ServerlessDeploymentBucketName"
+        "Name": "sls-graphql-api-dev-ServerlessDeploymentBucketName"
       }
     },
-    "AppLambdaFunctionQualifiedArn": {
+    "GraphqlLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "AppLambdaVersionxEZOjkaUr0yV3psCvvI9JFntmm82tdjMzLvkXPNZI"
+        "Ref": "GraphqlLambdaVersionr6waxs35W4rJdJmTctoqUm7KWYvrDItqaXReOjnIs"
       },
       "Export": {
-        "Name": "sls-flask-graphql-api-dev-AppLambdaFunctionQualifiedArn"
+        "Name": "sls-graphql-api-dev-GraphqlLambdaFunctionQualifiedArn"
       }
     },
     "ServiceEndpoint": {
@@ -404,7 +406,7 @@
         ]
       },
       "Export": {
-        "Name": "sls-flask-graphql-api-dev-ServiceEndpoint"
+        "Name": "sls-graphql-api-dev-ServiceEndpoint"
       }
     }
   }

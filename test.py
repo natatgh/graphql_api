@@ -3,7 +3,7 @@ import jwt
 import datetime
 
 # URL do seu servidor GraphQL
-url = 'http://localhost:5000/graphql'
+url = 'https://ep53z9zyci.execute-api.us-east-1.amazonaws.com/dev/graphql'
 
 # Chave secreta usada para gerar o token JWT
 SECRET_KEY = 'j2w9UHvP4bQz9g9V7vQ4tM6z2eK5tYx3'

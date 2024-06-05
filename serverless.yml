@@ -1,19 +1,26 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
 org: natatgh
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
 app: graphql-api
-service: flask-graphql-api
+service: graphql-api
 
 provider:
   name: aws
   runtime: python3.8
   stage: dev
   region: us-east-1
+  environment:
+    SECRET_KEY: 'your_secret_key_here'
+    API_KEY: 'j2w9UHvP4bQz9g9V7vQ4tM6z2eK5tYx3'
 
 functions:
-  app:
+  graphql:
     handler: wsgi.handler
     events:
-      - http: ANY /
-      - http: 'ANY {proxy+}'
+      - http:
+          path: graphql
+          method: post
+          cors: true
 
 plugins:
   - serverless-wsgi
@@ -28,4 +35,8 @@ package:
   exclude:
     - node_modules/**
     - venv/**
-    - .venv/**
+    - __pycache__/**
+    - .pytest_cache/**
+    - .serverless/**
+    - .idea/**
+    - .vscode/**
