@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 # Obtenha a URL do banco de dados a partir das variáveis de ambiente
-DATABASE_URL = os.environ.get('https://graph-ql-db-46cfbe784d60.herokuapp.com/')
+DATABASE_URL = os.environ.get('https://graphql-api-db-48699783ee5a.herokuapp.com/')
 engine = create_engine(DATABASE_URL)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 Base = declarative_base()
