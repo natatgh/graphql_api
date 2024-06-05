@@ -31,32 +31,15 @@ class AuthGraphQLView(GraphQLView):
         if token:
             user_id = validate_api_token(token)
             if not user_id:
-                return jsonify({"message": "Invalid or Expired Token"}), 403
-        elif api_key:
+                return jsonify({"message": "Invalid Authentication Token"}), 401
+        
+        if api_key:
             if not validate_api_key(api_key):
-                return jsonify({"message": "Invalid API Key"}), 403
+                return jsonify({"message": "Invalid API Key"}), 401
         
         return super().dispatch_request()
 
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.json
-    email = data.get('email')
-    password = data.get('password')
-    token = authenticate_user(email, password)
-    if token:
-        return jsonify({"token": token})
-    else:
-        return jsonify({"message": "Invalid credentials"}), 401
-
-app.add_url_rule(
-    '/graphql',
-    view_func=AuthGraphQLView.as_view(
-        'graphql',
-        schema=schema,
-        graphiql=True
-    )
-)
+app.add_url_rule('/graphql', view_func=AuthGraphQLView.as_view('graphql', schema=schema, graphiql=True))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
