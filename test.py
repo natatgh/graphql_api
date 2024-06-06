@@ -1,29 +1,15 @@
 import requests
-import jwt
-import datetime
 
 # URL do seu servidor GraphQL
 url = 'https://ep53z9zyci.execute-api.us-east-1.amazonaws.com/dev/graphql'
 
-# Chave secreta usada para gerar o token JWT
-SECRET_KEY = 'j2w9UHvP4bQz9g9V7vQ4tM6z2eK5tYx3'
+# Chave da API
+API_KEY = 'j2w9UHvP4bQz9g9V7vQ4tM6z2eK5tYx3'
 
-# Função para gerar um token JWT
-def generate_api_token(user_id):
-    payload = {
-        'user_id': user_id,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
-    }
-    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-    return token
-
-# Gera um token para o usuário com ID 1 (ou outro ID de teste)
-api_token = generate_api_token(1)
-
-# Headers para incluir o token de API
+# Headers para incluir a chave da API
 headers = {
     'Content-Type': 'application/json',
-    'Authorization': api_token
+    'X-API-KEY': API_KEY
 }
 
 # Consultas e variáveis para criação, atualização, exclusão e obtenção de usuários e contratos

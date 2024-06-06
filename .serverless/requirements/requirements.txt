@@ -7,3 +7,4 @@ SQLAlchemy==1.4.22
 Werkzeug==2.0.3
 graphene-sqlalchemy==2.3.0
 graphene==2.1.8
+pymysql

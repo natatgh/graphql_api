@@ -2,7 +2,6 @@ import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from models import User as UserModel, Contract as ContractModel
 from database import db_session
-from auth import validate_api_token
 import datetime
 
 class UserType(SQLAlchemyObjectType):

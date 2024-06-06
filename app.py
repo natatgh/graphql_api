@@ -1,8 +1,13 @@
+import os
 from flask import Flask, request, jsonify
 from flask_graphql import GraphQLView
 from schema import schema
 from database import db_session, init_db
-from auth import validate_api_token, authenticate_user, validate_api_key
+from auth import authenticate_user, validate_api_key
+
+# Certifique-se de que o diretório /tmp exista
+if not os.path.exists("/tmp"):
+    os.makedirs("/tmp")
 
 app = Flask(__name__)
 
@@ -22,24 +27,31 @@ def handle_error(e):
 
 class AuthGraphQLView(GraphQLView):
     def dispatch_request(self):
-        token = request.headers.get('Authorization')
         api_key = request.headers.get('X-API-KEY')
         
-        if not token and not api_key:
-            return jsonify({"message": "Missing Authentication Token or API Key"}), 401
-        
-        if token:
-            user_id = validate_api_token(token)
-            if not user_id:
-                return jsonify({"message": "Invalid Authentication Token"}), 401
-        
-        if api_key:
-            if not validate_api_key(api_key):
-                return jsonify({"message": "Invalid API Key"}), 401
+        if not api_key or not validate_api_key(api_key):
+            return jsonify({"message": "Invalid API Key"}), 403
         
         return super().dispatch_request()
 
-app.add_url_rule('/graphql', view_func=AuthGraphQLView.as_view('graphql', schema=schema, graphiql=True))
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+    if authenticate_user(email, password):
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        return jsonify({"message": "Invalid credentials"}), 401
+
+app.add_url_rule(
+    '/graphql',
+    view_func=AuthGraphQLView.as_view(
+        'graphql',
+        schema=schema,
+        graphiql=True
+    )
+)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

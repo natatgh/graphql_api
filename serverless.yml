@@ -10,8 +10,8 @@ provider:
   stage: dev
   region: us-east-1
   environment:
-    SECRET_KEY: 'your_secret_key_here'
-    API_KEY: 'j2w9UHvP4bQz9g9V7vQ4tM6z2eK5tYx3'
+    SECRET_KEY: ${env:SECRET_KEY}
+    API_KEY: ${env:API_KEY}
 
 functions:
   graphql:
@@ -25,6 +25,7 @@ functions:
 plugins:
   - serverless-wsgi
   - serverless-python-requirements
+  - serverless-dotenv-plugin
 
 custom:
   wsgi:
