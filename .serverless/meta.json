@@ -184,7 +184,7 @@
                   "S3Bucket": {
                     "Ref": "ServerlessDeploymentBucket"
                   },
-                  "S3Key": "serverless/graphql-api/dev/1717686665586-2024-06-06T15:11:05.586Z/graphql-api.zip"
+                  "S3Key": "serverless/graphql-api/dev/1717708234001-2024-06-06T21:10:34.001Z/graphql-api.zip"
                 },
                 "Handler": "wsgi_handler.handler",
                 "Runtime": "python3.8",
@@ -208,14 +208,14 @@
                 "GraphqlLogGroup"
               ]
             },
-            "GraphqlLambdaVersionnAdf5IxMwtltIcTaD1rLwQ8wj8Tv0jp44CHJs8Cw": {
+            "GraphqlLambdaVersionK3UIIkwV7ChbPa5eMAOJghgw1UMKH8szSOuJCleA": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "GraphqlLambdaFunction"
                 },
-                "CodeSha256": "BYinHuBEQz/IVisoTSTQAyMvz5/yTD5YYoHofyU8/LA="
+                "CodeSha256": "dLpVEIHfARQjpddhiYOwnK/mJP9vs+lSdBkINqfCLso="
               }
             },
             "ApiGatewayRestApi": {
@@ -336,7 +336,7 @@
                 "GraphqlLambdaPermissionApiGateway"
               ]
             },
-            "ApiGatewayDeployment1717686655109": {
+            "ApiGatewayDeployment1717708223803": {
               "Type": "AWS::ApiGateway::Deployment",
               "Properties": {
                 "RestApiId": {
@@ -399,7 +399,7 @@
             "GraphqlLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "GraphqlLambdaVersionnAdf5IxMwtltIcTaD1rLwQ8wj8Tv0jp44CHJs8Cw"
+                "Ref": "GraphqlLambdaVersionK3UIIkwV7ChbPa5eMAOJghgw1UMKH8szSOuJCleA"
               },
               "Export": {
                 "Name": "sls-graphql-api-dev-GraphqlLambdaFunctionQualifiedArn"
@@ -552,7 +552,7 @@
           "timeout": 6,
           "runtime": "python3.8",
           "vpc": {},
-          "versionLogicalId": "GraphqlLambdaVersionnAdf5IxMwtltIcTaD1rLwQ8wj8Tv0jp44CHJs8Cw"
+          "versionLogicalId": "GraphqlLambdaVersionK3UIIkwV7ChbPa5eMAOJghgw1UMKH8szSOuJCleA"
         }
       },
       "plugins": [
@@ -583,7 +583,7 @@
           ".serverless-wsgi"
         ],
         "artifact": "D:\\OneDrive\\Documentos\\Códigos\\graphql_api\\.serverless\\graphql-api.zip",
-        "artifactDirectoryName": "serverless/graphql-api/dev/1717686665586-2024-06-06T15:11:05.586Z"
+        "artifactDirectoryName": "serverless/graphql-api/dev/1717708234001-2024-06-06T21:10:34.001Z"
       }
     },
     "serviceRawFile": "# \"org\" ensures this Service is used with the correct Serverless Framework Access Key.\r\norg: natatgh\r\n# \"app\" enables Serverless Framework Dashboard features and sharing them with other Services.\r\napp: graphql-api\r\nservice: graphql-api\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: python3.8\r\n  stage: dev\r\n  region: us-east-1\r\n  environment:\r\n    SECRET_KEY: ${env:SECRET_KEY}\r\n    API_KEY: ${env:API_KEY}\r\n\r\nfunctions:\r\n  graphql:\r\n    handler: wsgi.handler\r\n    events:\r\n      - http:\r\n          path: graphql\r\n          method: post\r\n          cors: true\r\n\r\nplugins:\r\n  - serverless-wsgi\r\n  - serverless-python-requirements\r\n  - serverless-dotenv-plugin\r\n\r\ncustom:\r\n  wsgi:\r\n    app: app.app\r\n    packRequirements: false\r\n\r\npackage:\r\n  exclude:\r\n    - node_modules/**\r\n    - venv/**\r\n    - __pycache__/**\r\n    - .pytest_cache/**\r\n    - .serverless/**\r\n    - .idea/**\r\n    - .vscode/**\r\n",
@@ -628,12 +628,12 @@
     "serviceProviderAwsCfStackName": "graphql-api-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:381491840726:stack/graphql-api-dev/3cea0ce0-238c-11ef-bbd4-12086f391f35",
     "serviceProviderAwsCfStackCreated": "2024-06-05T22:37:49.687Z",
-    "serviceProviderAwsCfStackUpdated": "2024-06-06T15:11:25.165Z",
+    "serviceProviderAwsCfStackUpdated": "2024-06-06T21:10:53.272Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "GraphqlLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-east-1:381491840726:function:graphql-api-dev-graphql:8",
+        "OutputValue": "arn:aws:lambda:us-east-1:381491840726:function:graphql-api-dev-graphql:18",
         "Description": "Current Lambda function version",
         "ExportName": "sls-graphql-api-dev-GraphqlLambdaFunctionQualifiedArn"
       },

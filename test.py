@@ -1,7 +1,7 @@
 import requests
 
 # URL do seu servidor GraphQL
-url = 'https://ep53z9zyci.execute-api.us-east-1.amazonaws.com/dev/graphql'
+url = 'http://127.0.0.1:5000/graphql'
 
 # Chave da API
 API_KEY = 'j2w9UHvP4bQz9g9V7vQ4tM6z2eK5tYx3'
@@ -26,8 +26,7 @@ mutation createUser($input: CreateUserInput!) {
 create_user_variables = {
     "input": {
         "name": "John Doe",
-        "email": "john.doe@example.com",
-        "password": "password"
+        "email": "john.doe@example.com"
     }
 }
 
@@ -51,9 +50,6 @@ mutation updateUser($id: ID!, $input: UpdateUserInput!) {
     id
     name
     email
-    error {
-      message
-    }
   }
 }
 """
@@ -62,8 +58,7 @@ update_user_variables = {
     "id": "1",
     "input": {
         "name": "John Doe Updated",
-        "email": "john.doe.updated@example.com",
-        "password": "newpassword"
+        "email": "john.doe.updated@example.com"
     }
 }
 
